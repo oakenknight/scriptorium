@@ -1,0 +1,6 @@
+name: validate-state
+description: After state file writes, validates required fields that enable skill resumption
+script: validate-state.sh
+triggers:
+  - event: after-tool-use
+    match-tool: [write, edit]

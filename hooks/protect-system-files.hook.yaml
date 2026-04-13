@@ -1,0 +1,6 @@
+name: protect-system-files
+description: Blocks writes and edits to core source files that must not change after deployment
+script: protect-system-files.sh
+triggers:
+  - event: before-tool-use
+    match-tool: [write, edit]

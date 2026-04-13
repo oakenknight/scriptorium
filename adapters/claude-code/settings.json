@@ -1,0 +1,49 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .scriptorium/hooks/protect-system-files.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .scriptorium/hooks/validate-frontmatter.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .scriptorium/hooks/validate-ledger.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .scriptorium/hooks/validate-state.sh"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .scriptorium/hooks/notify.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+name: validate-ledger
+description: After session ledger writes, validates structural integrity of the handoff/receipt log
+script: validate-ledger.sh
+triggers:
+  - event: after-tool-use
+    match-tool: [write, edit]

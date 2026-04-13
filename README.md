@@ -38,6 +38,30 @@ moving, renaming, and linking.
 
 ---
 
+## Skills
+
+Skills are multi-step, stateful workflows that orchestrate sequences of
+agent calls to complete longer tasks. Unlike agents (which handle single
+reactive operations), skills run in the main conversation context and
+preserve state across turns so they can be resumed in a later session.
+
+| Skill | What it does |
+|---|---|
+| **onboarding** | Guided vault initialization — collects knowledge domains and active projects, then scaffolds the full vault structure via the Custodian. |
+| **create-agent** | Interactive workflow for designing and writing a new custom agent file that conforms to the Scriptorium agent schema. |
+| **manage-agent** | Lists, inspects, edits, and deletes custom agents. Core agents are read-only. |
+| **transcribe** | Processes a recording or raw transcript through an interview — determines type, speakers, date, project — and routes the structured output to the right section. |
+| **maintain** | Orchestrated vault maintenance in two modes: light (inbox drain + structural check) and deep (adds full audit, enrichment pass, domain health review). |
+| **domain-garden** | Reviews the Codex domain structure — identifies empty, thin, bloated, and overlapping domains — and proposes merges, splits, and pruning. |
+| **close-project** | Guides project closure through retrospective, knowledge extraction to the Codex, open item resolution, and archival. |
+| **synthesis-session** | Guided, iterative synthesis conversation with the Oracle — scope a question, review retrieved material, shape a draft, file the result. |
+
+Skills are defined in `skills/*.md`. Each skill stores its in-progress
+state at `Meta/state/<skill-name>.yaml` and resumes automatically if
+the session ends mid-workflow.
+
+---
+
 ## The vault structure
 
 ```
@@ -105,14 +129,32 @@ Custodian and block content work until resolved.
 
 ## State persistence
 
-Each agent maintains a versioned YAML state file at
-`Meta/state/<agent>.yaml`. State files track what the agent last did,
-what it is waiting for (pending receipts), and agent-specific memory
-(known domains for the Custodian, routing log for the Quaestor, etc.).
+Each agent and skill maintains a versioned YAML state file at
+`Meta/state/<name>.yaml`. State files track the current phase, what
+the agent is waiting for, and any in-progress data needed for resumption.
 
 The dispatcher maintains a shared session ledger at
 `Meta/ledger/session.yaml` — a rolling log of all handoffs and
 receipts. This is the audit trail of coordination, not agent memory.
+
+---
+
+## Hooks
+
+Shell scripts that run automatically before or after agent tool calls.
+Deployed to `.scriptorium/hooks/` and registered in `.claude/settings.json`.
+
+| Hook | When | What it does |
+|---|---|---|
+| **protect-system-files** | Before Write/Edit | Blocks writes to core source files (agents, skills, dispatcher, adapters, deployed hooks). Allows all runtime-mutable paths. |
+| **validate-frontmatter** | After Write | Checks YAML syntax and required schema fields (title, type, date, status; plus type-specific extras for reference/meeting/synthesis notes). |
+| **validate-ledger** | After Write/Edit | After session.yaml writes, verifies structural integrity of the handoff/receipt log: required keys, per-entry fields, enum values for type and status. |
+| **validate-state** | After Write/Edit | After Meta/state/*.yaml writes, verifies required fields for skill resumption: identity field, version, phase, timestamps. |
+| **notify** | Notification event | Desktop notification with "Scriptorium" branding via osascript (macOS) or notify-send (Linux). |
+
+All hooks check for `jq` and fall back to `grep`/`sed` parsing if it is
+not available. See `hooks/README.md` for per-hook check details and
+instructions for adding new hooks.
 
 ---
 
@@ -128,9 +170,25 @@ agents/
   archivist.md          Vault health
   oracle.md             Retrieval and synthesis
 
+skills/
+  SCHEMA.md             Skill frontmatter schema reference
+  onboarding.md
+  create-agent.md
+  manage-agent.md
+  transcribe.md
+  maintain.md
+  domain-garden.md
+  close-project.md
+  synthesis-session.md
+
 coordination/
-  dispatcher.md         Routing rules and handoff protocol
+  dispatcher.md         Routing rules, skill table, handoff protocol
   ledger-schema.yaml    Session ledger schema
+
+hooks/
+  *.sh                  Hook scripts (source — deployed by install.sh)
+  *.hook.yaml           Hook metadata (event, trigger, script mapping)
+  README.md             Hook reference for developers
 
 vault-template/         Starter vault skeleton
   Atrium/_index.md
@@ -140,28 +198,44 @@ vault-template/         Starter vault skeleton
   Compendium/_index.md
   Reliquary/_index.md
   Meta/
-    _index.md
+    vault.config.yaml   Section path config (single source of truth)
     registry/domains.yaml
     ledger/session.yaml
-    state/<agent>.yaml  (one per agent, initialized empty)
-    templates/          (note, meeting, journal, review, brief, reference)
+    state/*.yaml        One stub per agent and skill (15 total)
+    templates/          note, meeting, journal, review, brief, reference
 
 adapters/
-  claude-code/CLAUDE.md Claude Code dispatcher entrypoint
+  claude-code/
+    CLAUDE.md           Dispatcher entrypoint for Claude Code
+    settings.json       Hook registration (source — deployed to .claude/)
+    install.sh          Deployment script
 ```
 
 ---
 
 ## Getting started
 
-1. Copy `vault-template/` into your Obsidian vault root.
-2. Place the system directory (or a reference to it) where your
-   agent platform can find the agent files.
-3. For Claude Code: copy `adapters/claude-code/CLAUDE.md` to your
-   vault root as `CLAUDE.md`, and update the agent file paths.
-4. Start a session. If the vault has no structure, the Custodian
-   initializes it automatically.
-5. Talk to the dispatcher. It routes your requests to the right agent.
+```bash
+bash path/to/brainoff/adapters/claude-code/install.sh ~/my-vault
+cd ~/my-vault
+claude
+```
+
+Then say: **"initialize the vault"**
+
+The onboarding skill walks you through your knowledge domains and active
+projects, then the Custodian builds the full vault structure. After that,
+every session starts with the dispatcher loaded and hooks active.
+
+To preview what the installer will do without writing anything:
+
+```bash
+bash path/to/brainoff/adapters/claude-code/install.sh ~/my-vault --dry-run
+```
+
+To update an existing vault to a newer version of Scriptorium, run the
+same command again. The installer detects the existing installation,
+replaces system files, and preserves all vault content and state.
 
 ---
 
@@ -183,6 +257,11 @@ synthesize. Clear boundaries make the system debuggable.
 **Receipts close loops.** When an agent is blocked waiting for
 structure, it says so explicitly and waits for a receipt. Implicit
 dependencies cause silent failures. Explicit receipts catch them.
+
+**Skills run in the conversation; agents run as subprocesses.** Multi-step
+workflows (onboarding, project closure, synthesis sessions) need to
+preserve state across turns and loop back on user feedback. Agents handle
+single reactive operations. The distinction keeps each layer simple.
 
 **The Oracle synthesizes; other agents do not.** Only the Oracle
 creates new synthesis notes from accumulated knowledge. Other agents

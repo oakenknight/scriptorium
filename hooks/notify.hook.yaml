@@ -1,0 +1,5 @@
+name: notify
+description: Sends a desktop notification with Scriptorium branding when the system needs user attention
+script: notify.sh
+triggers:
+  - event: on-notification

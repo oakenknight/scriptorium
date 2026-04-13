@@ -1,0 +1,6 @@
+name: validate-frontmatter
+description: Validates YAML frontmatter syntax and required schema fields on vault content notes
+script: validate-frontmatter.sh
+triggers:
+  - event: after-tool-use
+    match-tool: [write]
