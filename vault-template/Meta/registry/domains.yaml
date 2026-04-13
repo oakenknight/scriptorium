@@ -1,0 +1,16 @@
+# Scriptorium Domain Registry
+# Maintained by the Custodian. Do not edit manually.
+# Add entries via the Custodian agent.
+
+schema_version: 1
+last_updated: YYYY-MM-DD
+
+domains: []
+
+# Example entry:
+# - slug: philosophy
+#   display_name: Philosophy
+#   created: "2026-04-13"
+#   merged_from: []
+#   merged_into: null
+#   status: active    # active | merged | dormant

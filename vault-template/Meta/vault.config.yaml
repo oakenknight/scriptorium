@@ -1,0 +1,34 @@
+# Scriptorium Vault Configuration
+# This is the single source of truth for all vault paths.
+# Agents read this file before referencing any vault section.
+# To rename a section, change it here — nowhere else.
+
+schema_version: 1
+
+sections:
+  inbox: Atrium            # raw capture, unprocessed input
+  knowledge: Codex         # permanent knowledge notes, by domain
+  log: Annals              # chronological records (meetings, journals)
+  reference: Cartulary     # external sources and saved material
+  active: Compendium       # active projects and responsibilities
+  archive: Reliquary       # completed projects, dormant work
+  system: Meta             # agent state, registry, templates, ledger
+
+system_paths:
+  domain_registry: Meta/registry/domains.yaml
+  session_ledger:  Meta/ledger/session.yaml
+  templates:       Meta/templates
+  state:           Meta/state
+  audit_reports:   Meta/ledger
+
+naming:
+  inbox_file:      "YYYY-MM-DD.inbox.md"
+  knowledge_note:  "title-slug.md"
+  log_meeting:     "YYYY-MM-DD.meeting.md"
+  log_journal:     "YYYY-MM-DD.journal.md"
+  log_daily:       "YYYY-MM-DD.daily.md"
+  log_review:      "YYYY-WXX.review.md"
+  reference_note:  "author--title-slug.md"
+  synthesis_note:  "synthesis--topic-slug.md"
+  project_brief:   "_brief.md"
+  section_index:   "_index.md"

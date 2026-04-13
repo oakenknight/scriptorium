@@ -1,0 +1,8 @@
+# Scriptorium Session Ledger
+# Maintained by the Dispatcher. Do not edit manually.
+# Schema documented in coordination/ledger-schema.yaml
+
+schema_version: 1
+max_entries: 100
+open_receipts: []
+entries: []

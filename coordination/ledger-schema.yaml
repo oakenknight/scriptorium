@@ -1,0 +1,85 @@
+# Scriptorium Session Ledger Schema
+# Location in vault: Meta/ledger/session.yaml
+# This file documents the schema. The actual ledger lives in the vault.
+
+schema_version: 1
+
+description: >
+  The session ledger is the dispatcher's audit trail. It records every
+  handoff and receipt in a rolling log. All agents and the dispatcher
+  read and write this file. It is not a state file — it does not store
+  agent-specific memory. It is a coordination record.
+
+max_entries: 100
+rotation_threshold: 100
+rotation_batch: 20
+rotation_archive_pattern: "Meta/ledger/archive-YYYY-MM.yaml"
+
+fields:
+  max_entries:
+    type: integer
+    description: Maximum number of entries before rotation
+    default: 100
+
+  open_receipts:
+    type: list
+    description: >
+      Handoff IDs that have requires_receipt: true and have not yet
+      received a matching receipt block. The dispatcher tracks these
+      to know when a blocked chain can resume.
+    item_fields:
+      id: string           # the handoff id
+      from: string         # agent that sent the handoff
+      to: string           # agent that should send the receipt
+      waiting_since: string  # ISO timestamp
+
+  entries:
+    type: list
+    description: Rolling log of all handoffs and receipts
+    item_fields:
+      timestamp: string    # ISO 8601: YYYY-MM-DDTHH:MM:SS
+      type:
+        enum: [handoff, receipt]
+      from: string         # agent name
+      to: string           # agent name
+      id: string           # unique id: YYYY-MM-DDTHH:MM:SS-<from-agent>
+      structural_gap:
+        enum:
+          - unknown_domain
+          - missing_project_folder
+          - naming_violation
+          - missing_index
+          - stale_moc
+        required: false    # only present when the handoff signals a gap
+      requires_receipt:
+        type: boolean
+        required: false
+      for_handoff_id:
+        type: string
+        required: false    # only present on receipt entries
+      status:
+        enum: [open, resolved, blocked]
+      summary:
+        type: string
+        required: false    # present on receipt entries
+
+example:
+  max_entries: 100
+  open_receipts: []
+  entries:
+    - timestamp: "2026-04-13T14:23:00"
+      type: handoff
+      from: quaestor
+      to: custodian
+      id: "2026-04-13T14:23:00-quaestor"
+      structural_gap: unknown_domain
+      requires_receipt: true
+      status: open
+    - timestamp: "2026-04-13T14:23:45"
+      type: receipt
+      from: custodian
+      to: quaestor
+      id: "2026-04-13T14:23:45-custodian"
+      for_handoff_id: "2026-04-13T14:23:00-quaestor"
+      status: resolved
+      summary: "Domain 'machine-learning' created and registered"
