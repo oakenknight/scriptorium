@@ -75,6 +75,8 @@ the user's original message. The skill takes over the conversation.
 | `domain-garden` | "domain garden", "review my domains", "audit domains", "domain health", "merge domains", "split a domain" |
 | `close-project` | "close a project", "wrap up a project", "archive a project", "project is done", "project retrospective", "end of project" |
 | `synthesis-session` | "synthesis session", "let's synthesize", "help me synthesize", "guided synthesis", "I want to think through", "make sense of my notes on" |
+| `content-writer` | "write a blog post", "write an article", "write a post", "write a thread", "draft content", "draft a post", "draft an article", "help me write", "create a blog post", "write about", "content draft" |
+| `research-github-org` | "research github org", "research org", "score org", "qualify org", "research this org", "check this github org", "analyze github org", "look up org" |
 
 ### Collision resolution
 

@@ -32,3 +32,19 @@ naming:
   synthesis_note:  "synthesis--topic-slug.md"
   project_brief:   "_brief.md"
   section_index:   "_index.md"
+
+# Per-skill configuration.
+# Each key under `skills` maps to a skill name (from the skill's `name:` frontmatter).
+# Skills read their params from here instead of hardcoding paths.
+skills:
+  research-github-org:
+    # Required: path to the scoring criteria doc the skill uses in Phase 4.
+    criteria_file: Compendium/<project-slug>/lead-qualification-criteria.md
+    # Required: directory where per-org research notes are written.
+    output_dir: Compendium/<project-slug>/repo-research
+    # Optional: file mapping org display names to GitHub slugs.
+    org_list_file: Compendium/<project-slug>/github-orgs.md
+    # Optional: section index to append a summary entry after each research run.
+    index_file: Compendium/<project-slug>/_index.md
+    # Optional: value written to the `project:` field in saved note frontmatter.
+    project_tag: ""
