@@ -216,7 +216,7 @@ adapters/
 ## Getting started
 
 ```bash
-bash path/to/brainoff/adapters/claude-code/install.sh ~/my-vault
+bash path/to/Scriptorium/adapters/claude-code/install.sh ~/my-vault
 cd ~/my-vault
 claude
 ```
@@ -230,7 +230,7 @@ every session starts with the dispatcher loaded and hooks active.
 To preview what the installer will do without writing anything:
 
 ```bash
-bash path/to/brainoff/adapters/claude-code/install.sh ~/my-vault --dry-run
+bash path/to/Scriptorium/adapters/claude-code/install.sh ~/my-vault --dry-run
 ```
 
 To update an existing vault to a newer version of Scriptorium, run the

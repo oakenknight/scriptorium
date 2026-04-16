@@ -200,7 +200,7 @@ Message is truncated to 200 characters.
 
 ## Deployment
 
-Hooks live in `hooks/` in the brainoff source repository. The Claude Code
+Hooks live in `hooks/` in the Scriptorium source repository. The Claude Code
 adapter deploys them to `.scriptorium/hooks/` inside the vault root alongside
 `settings.json`. Scripts run relative to the vault root, so
 `.scriptorium/hooks/` in `settings.json` is a relative path from the vault.
@@ -217,7 +217,7 @@ adapter deploys them to `.scriptorium/hooks/` inside the vault root alongside
     settings.json     ← hook registration
 ```
 
-The `.hook.yaml` files in `hooks/` are metadata for the brainoff source
+The `.hook.yaml` files in `hooks/` are metadata for the Scriptorium source
 repository (used to describe hooks and match them to their scripts). They are
 not read by Claude Code at runtime — `settings.json` is the platform's
 registration file.

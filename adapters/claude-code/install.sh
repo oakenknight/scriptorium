@@ -3,7 +3,7 @@
 # install.sh — Scriptorium deployment script for Claude Code
 # =============================================================================
 #
-# Copies the Scriptorium system from the brainoff repository into a vault
+# Copies the Scriptorium system from the Scriptorium repository into a vault
 # directory so that Claude Code can use it. Handles both fresh installs and
 # upgrades while preserving vault content and user-created files.
 #
@@ -60,7 +60,7 @@
 set -euo pipefail
 
 # ─── Script location → repo root ─────────────────────────────────────────────
-# This script lives at adapters/claude-code/install.sh inside the brainoff repo.
+# This script lives at adapters/claude-code/install.sh inside the Scriptorium repo.
 # We resolve the repo root as two levels up from this script's directory.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
@@ -137,7 +137,7 @@ $DRY_RUN && printf '\n%s%s DRY RUN — no files will be written %s\n\n' \
   "$BOLD$YELLOW" "┌─" "─┐$RESET"
 
 # ─── Repo integrity check ─────────────────────────────────────────────────────
-# Verify that this script is running from a valid brainoff repo and that all
+# Verify that this script is running from a valid Scriptorium repo and that all
 # source files it needs to deploy are present.
 header "Checking repository integrity"
 
@@ -175,7 +175,7 @@ if [[ ${#MISSING_FILES[@]} -gt 0 ]]; then
   for f in "${MISSING_FILES[@]}"; do
     err "  ${REPO_ROOT}/${f}"
   done
-  err "The brainoff repository may be corrupt or this is not the repo root."
+  err "The Scriptorium repository may be corrupt or this is not the repo root."
   exit 1
 fi
 ok "Repository looks intact (${REPO_ROOT})"
